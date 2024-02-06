@@ -38,7 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar'
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -48,7 +51,24 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+
+]
+
+def show_toolbar(request):                                     # <-- NEW
+    return True                                                # <-- NEW
+
+DEBUG_TOOLBAR_CONFIG = {                                       # <-- NEW
+    "SHOW_TOOLBAR_CALLBACK" : show_toolbar,                    # <-- NEW
+}                                                              # <-- NEW
+
+if DEBUG:                                                      # <-- NEW
+    import mimetypes                                           # <-- NEW
+    mimetypes.add_type("application/javascript", ".js", True)
 
 ROOT_URLCONF = 'mysite.urls'
 
@@ -69,6 +89,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
+
+
 
 
 # Database
