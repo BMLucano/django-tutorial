@@ -5,6 +5,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
 from django.views import generic
+from django.utils import timezone
 
 from .models import Question, Choice
 
@@ -15,9 +16,10 @@ class IndexView(generic.ListView):
 
     def get_queryset(self):
         """Return the last five published questions."""
-        return Question.objects.order_by("-pub_date")[:5]
+        return Question.objects.filter(
+            pub_date__lte=timezone.now()).order_by("-pub_date")[:5]
 
-####Old view before generic view
+# Old view before generic view
 # def index(request):
 #     latest_question_list = Question.objects.order_by("-pub_date")[:5]
 #     template = loader.get_template("polls/index.html")
@@ -27,11 +29,18 @@ class IndexView(generic.ListView):
 #     # return HttpResponse(template.render(context, request))
 #     return render(request, "polls/index.html", context)
 
+
 class DetailView(generic.DetailView):
     model = Question
     template_name = "polls/detail.html"
 
-####Old view before generic view
+    def get_queryset(self):
+        """
+        Excludes any questions that aren't published yet.
+        """
+        return Question.objects.filter(pub_date__lte=timezone.now())
+
+# Old view before generic view
 # def detail(request, question_id):
 #     # try:
 #     #     question = Question.objects.get(pk=question_id)
@@ -41,11 +50,12 @@ class DetailView(generic.DetailView):
 #     question = get_object_or_404(Question, pk=question_id)
 #     return render(request, "polls/detail.html", {"question": question})
 
+
 class ResultsView(generic.DetailView):
     model = Question
     template_name = "polls/results.html"
 
-####Old view before generic view
+# Old view before generic view
 # def results(request, question_id):
 #     question = get_object_or_404(Question, pk=question_id)
 #     return render(request, "polls/results.html", {"question": question})
@@ -72,5 +82,3 @@ def vote(request, question_id):
         # user hits the Back button.
 
         return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
-
-
